@@ -408,6 +408,14 @@ function Tracker.resetData()
 		healingItems = {
 			healing = 0,
 			numHeals = 0,
+			status = {
+				burn = 0,
+				freeze = 0,
+				sleep = 0,
+				poison = 0,
+				paralyze = 0,
+				any = 0,
+			},
 		},
 		hiddenPowers = { -- Track hidden power types for each of your own Pokemon [personality] = [type]
 			[0] = MoveData.HiddenPowerTypeList[1],

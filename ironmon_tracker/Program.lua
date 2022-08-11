@@ -11,6 +11,7 @@ Program = {
 		three_sec_update = 180,
 		saveData = 3600,
 		carouselActive = 0,
+		healingCarouselActive = 0,
 	},
 	BattleTurn = {
 		turnCount = -1,
@@ -807,6 +808,14 @@ function Program.calcBagHealingItemsFromMemory(pokemonMaxHP)
 	local totals = {
 		healing = 0,
 		numHeals = 0,
+		status = {
+			burn = 0,
+			freeze = 0,
+			sleep = 0,
+			poison = 0,
+			paralyze = 0,
+			all = 0,
+		},
 	}
 
 	-- Check for potential divide-by-zero errors
@@ -823,6 +832,8 @@ function Program.calcBagHealingItemsFromMemory(pokemonMaxHP)
 	-- for _, item in pairs(MiscData.healingItems) do
 	for itemID, quantity in pairs(healingItemsInBag) do
 		local healItemData = MiscData.HealingItems[itemID]
+		local statusHealItemData = MiscData.StatusItems[itemID]
+
 		if healItemData ~= nil and quantity > 0 then
 			local healingPercentage = 0
 			if healItemData.type == MiscData.HealingType.Constant then
@@ -838,6 +849,34 @@ function Program.calcBagHealingItemsFromMemory(pokemonMaxHP)
 			totals.healing = totals.healing + healingPercentage
 			totals.numHeals = totals.numHeals + quantity
 		end
+		if (statusHealItemData ~= null and quantity > 0) then
+			if statusHealItemData.type = MiscData.StatusType.Burn then
+				status.burn = status.burn + 1
+			end
+			if statusHealItemData.type = MiscData.StatusType.Poison then
+				status.freeze = status.freeze + 1
+			end
+			if statusHealItemData.type = MiscData.StatusType.Poison then
+				status.sleep = status.sleep + 1
+			end
+			if statusHealItemData.type = MiscData.StatusType.Poison then
+				status.poison = status.poison + 1
+			end
+			if statusHealItemData.type = MiscData.StatusType.Poison then
+				status.paralyze = status.paralyze + 1
+			end
+			if statusHealItemData.type = MiscData.StatusType.All then
+				--[[ not sure if we should double count the 'All' heals in the individual categories. Leaning towards no
+				status.burn = status.burn + 1
+				status.freeze = status.freeze + 1
+				status.sleep = status.sleep + 1
+				status.poison = status.poison + 1
+				status.paralyze = status.paralyze + 1
+				]]
+				status.all = status.all + 1
+			end
+		end
+
 	end
 
 	return totals
@@ -858,7 +897,7 @@ function Program.getHealingItemsFromMemory()
 			--read 4 bytes at once, should be less expensive than reading two sets of 2 bytes.
 			local itemid_and_quantity = Memory.readdword(address + i * 0x4)
 			local itemID = Utils.getbits(itemid_and_quantity, 0, 16)
-			if itemID ~= 0 and MiscData.HealingItems[itemID] ~= nil then
+			if itemID ~= 0 and (MiscData.HealingItems[itemID] ~= nil or MiscData.StatusItems[itemID] ~= nil) then
 				local quantity = Utils.getbits(itemid_and_quantity, 16, 16)
 				if key ~= nil then quantity = bit.bxor(quantity, key) end
 				healingItems[itemID] = quantity

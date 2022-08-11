@@ -166,9 +166,17 @@ TrackerScreen.CarouselTypes = {
 	NOTES = 4, -- During new game intro or inside of battle
 }
 
+TrackerScreen.HealingCarouselTypes = {
+	PC_HEALS = 1, -- Always
+	STATUS_HEALS = 2, -- Always
+}
+
 TrackerScreen.carouselIndex = 1
 TrackerScreen.tipMessageIndex = 0
 TrackerScreen.CarouselItems = {}
+
+TrackerScreen.healingCarouselIndex = 1
+TrackerScreen.HealingCarouselItems = {}
 
 function TrackerScreen.initialize()
 	-- Buttons for stat markings tracked by the user
@@ -229,7 +237,7 @@ function TrackerScreen.initialize()
 end
 
 -- Define each Carousel Item, must will have blank data that will be populated later with contextual data
-function TrackerScreen.buildCarousel()
+function TrackerScreen.buildCarousels()
 	--  BADGE
 	TrackerScreen.CarouselItems[TrackerScreen.CarouselTypes.BADGES] = {
 		type = TrackerScreen.CarouselTypes.BADGES,
@@ -314,6 +322,29 @@ function TrackerScreen.buildCarousel()
 		end,
 	}
 
+	--HEALING CAROUSEL
+
+	--PC Heals
+	TrackerScreen.HealingCarouselItems[TrackerScreen.HealingCarouselTypes.PC_HEALS] = {
+		type = TrackerScreen.HealingCarouselTypes.PC_HEALS,
+		isVisible = true,
+		framesToShow = 420,
+		getContentList = function()
+			local healData = {}
+			return healData
+		end,
+	}
+	--Status Heals
+	TrackerScreen.HealingCarouselItems[TrackerScreen.HealingCarouselTypes.STATUS_HEALS] = {
+		type = TrackerScreen.HealingCarouselTypes.STATUS_HEALS,
+		isVisible = true,
+		framesToShow = 420,
+		getContentList = function()
+			local statusHealData = {}
+			return statusHealData
+		end,
+	}
+
 	-- Easter Egg for the "-69th" seed
 	if Options["Show tips on startup"] then
 		local romnumber = string.match(gameinfo.getromname(), '[0-9]+')
@@ -352,6 +383,23 @@ function TrackerScreen.getCurrentCarouselItem()
 
 	return carousel
 end
+function TrackerScreen.getCurrentHealingCarouselItem()
+	local carousel = TrackerScreen.HealingCarouselItems[TrackerScreen.healingCarouselIndex]
+
+	-- Adjust rotation delay check for carousel based on the speed of emulation
+	local fpsMultiplier = math.max(client.get_approx_framerate() / 60, 1) -- minimum of 1
+	local adjustedVisibilityFrames = carousel.framesToShow * fpsMultiplier
+
+	-- Check if the current carousel's time has expired, or if it shouldn't be shown
+	if carousel == nil or not carousel.isVisible() or Program.Frames.healingCarouselActive > adjustedVisibilityFrames then
+		local nextCarousel = TrackerScreen.getNextVisibleHealingCarouselItem(TrackerScreen.healingCarouselIndex)
+		TrackerScreen.healingCarouselIndex = nextCarousel.type
+		Program.Frames.healingCarouselActive = 0
+		return nextCarousel
+	end
+
+	return carousel
+end
 
 function TrackerScreen.getNextVisibleCarouselItem(startIndex)
 	local numItems = #TrackerScreen.CarouselItems
@@ -361,6 +409,19 @@ function TrackerScreen.getNextVisibleCarouselItem(startIndex)
 	while (nextIndex ~= startIndex and not carousel.isVisible()) do
 		nextIndex = (nextIndex % numItems) + 1
 		carousel = TrackerScreen.CarouselItems[nextIndex]
+	end
+
+	return carousel
+end
+
+function TrackerScreen.getNextVisibleHealingCarouselItem(startIndex)
+	local numItems = #TrackerScreen.HealingCarouselItems
+	local nextIndex = (startIndex % numItems) + 1
+	local carousel = TrackerScreen.HealingCarouselItems[nextIndex]
+
+	while (nextIndex ~= startIndex and not carousel.isVisible()) do
+		nextIndex = (nextIndex % numItems) + 1
+		carousel = TrackerScreen.HealingCarouselItems[nextIndex]
 	end
 
 	return carousel
@@ -602,6 +663,7 @@ function TrackerScreen.drawPokemonInfoArea(pokemon)
 	gui.drawRectangle(Constants.SCREEN.WIDTH + Constants.SCREEN.MARGIN, Constants.SCREEN.MARGIN + 52, 96, infoBoxHeight, Theme.COLORS["Upper box border"], Theme.COLORS["Upper box background"])
 
 	if Tracker.Data.isViewingOwn then
+		if (Tracker.Data.)
 		Drawing.drawText(Constants.SCREEN.WIDTH + 6, 57, "Heals in Bag:", Theme.COLORS["Default text"], shadowcolor)
 		local healPercentage = math.min(9999, Tracker.Data.healingItems.healing)
 		local healCount = math.min(99, Tracker.Data.healingItems.numHeals)
@@ -897,4 +959,29 @@ function TrackerScreen.drawCarouselArea(pokemon)
 	local y = 137
 	gui.drawLine(x, y, x, y + 14, Theme.COLORS["Lower box border"])
 	gui.drawRectangle(x + 1, y, 12, 14, Theme.COLORS["Main background"], Theme.COLORS["Main background"])
+end
+
+function TrackerScreen.drawHealingCarouselArea(pokemon)
+	local shadowcolor = Utils.calcShadowColor(Theme.COLORS["Lower box background"])
+
+	-- Draw the border box for the Stats area
+	gui.drawRectangle(Constants.SCREEN.WIDTH + Constants.SCREEN.MARGIN, 136, Constants.SCREEN.RIGHT_GAP - (2 * Constants.SCREEN.MARGIN), 19, Theme.COLORS["Lower box border"], Theme.COLORS["Lower box background"])
+
+	local carousel = TrackerScreen.getCurrentHealingCarouselItem()
+	for _, content in pairs(carousel.getContentList(pokemon)) do
+		if type(content) == "string" then
+			local wrappedText = Utils.getWordWrapLines(content, 34) -- was 31
+
+			if #wrappedText == 1 then
+				Drawing.drawText(Constants.SCREEN.WIDTH + Constants.SCREEN.MARGIN + 1, 140, wrappedText[1], Theme.COLORS["Default text"], shadowcolor)
+			elseif #wrappedText >= 2 then
+				Drawing.drawText(Constants.SCREEN.WIDTH + Constants.SCREEN.MARGIN + 1, 136, wrappedText[1], Theme.COLORS["Default text"], shadowcolor)
+				Drawing.drawText(Constants.SCREEN.WIDTH + Constants.SCREEN.MARGIN + 1, 145, wrappedText[2], Theme.COLORS["Default text"], shadowcolor)
+				gui.drawLine(Constants.SCREEN.WIDTH + Constants.SCREEN.MARGIN, 155, Constants.SCREEN.WIDTH + Constants.SCREEN.RIGHT_GAP - Constants.SCREEN.MARGIN, 155, Theme.COLORS["Lower box border"])
+				gui.drawLine(Constants.SCREEN.WIDTH + Constants.SCREEN.MARGIN, 156, Constants.SCREEN.WIDTH + Constants.SCREEN.RIGHT_GAP - Constants.SCREEN.MARGIN, 156, Theme.COLORS["Main background"])
+			end
+		end
+	end
+
+
 end
