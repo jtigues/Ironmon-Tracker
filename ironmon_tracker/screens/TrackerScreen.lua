@@ -168,7 +168,8 @@ TrackerScreen.CarouselTypes = {
 
 TrackerScreen.HealingCarouselTypes = {
 	PC_HEALS = 1, -- Always
-	STATUS_HEALS = 2, -- Always
+	STATUS_HEALS_1 = 2, -- Always
+	STATUS_HEALS_2 = 3, -- Always
 }
 
 TrackerScreen.carouselIndex = 1
@@ -233,7 +234,7 @@ function TrackerScreen.initialize()
 		}
 	end
 
-	TrackerScreen.buildCarousel()
+	TrackerScreen.buildCarousels()
 end
 
 -- Define each Carousel Item, must will have blank data that will be populated later with contextual data
@@ -327,21 +328,55 @@ function TrackerScreen.buildCarousels()
 	--PC Heals
 	TrackerScreen.HealingCarouselItems[TrackerScreen.HealingCarouselTypes.PC_HEALS] = {
 		type = TrackerScreen.HealingCarouselTypes.PC_HEALS,
-		isVisible = true,
-		framesToShow = 420,
-		getContentList = function()
-			local healData = {}
-			return healData
+		isVisible = function() return Tracker.Data.isViewingOwn end,
+		framesToShow = 180,
+		draw = function()
+			if Tracker.Data.isViewingOwn then
+				local shadowcolor = Utils.calcShadowColor(Theme.COLORS["Upper box background"])
+				Drawing.drawText(Constants.SCREEN.WIDTH + 6, 57, "Heals in Bag:", Theme.COLORS["Default text"], shadowcolor)
+				local healPercentage = math.min(9999, Tracker.Data.healingItems.healing)
+				local healCount = math.min(99, Tracker.Data.healingItems.numHeals)
+				Drawing.drawText(Constants.SCREEN.WIDTH + 6, 67, string.format("%.0f%%", healPercentage) .. " HP (" .. healCount .. ")", Theme.COLORS["Default text"], shadowcolor)
+			end
 		end,
 	}
 	--Status Heals
-	TrackerScreen.HealingCarouselItems[TrackerScreen.HealingCarouselTypes.STATUS_HEALS] = {
-		type = TrackerScreen.HealingCarouselTypes.STATUS_HEALS,
-		isVisible = true,
-		framesToShow = 420,
-		getContentList = function()
-			local statusHealData = {}
-			return statusHealData
+	TrackerScreen.HealingCarouselItems[TrackerScreen.HealingCarouselTypes.STATUS_HEALS_1] = {
+		type = TrackerScreen.HealingCarouselTypes.STATUS_HEALS_1,
+		isVisible = function() return Tracker.Data.isViewingOwn end,
+		framesToShow = 180,
+		draw = function() 
+			-- TODO: draw status heals section
+			local shadowcolor = Utils.calcShadowColor(Theme.COLORS["Upper box background"])
+			Drawing.drawText(Constants.SCREEN.WIDTH + 6, 57, "Heals in Bag:", Theme.COLORS["Default text"], shadowcolor)
+			local i = 0
+			for status, quantity in pairs(Tracker.Data.healingItems.status) do
+				if status == MiscData.StatusType.Burn or status == MiscData.StatusType.Paralyze or status == MiscData.StatusType.Poison then
+					local statusHealCount = math.min(99, quantity)
+					Drawing.drawStatusIcon(MiscData.StatusCodeMap[status],Constants.SCREEN.WIDTH + 8 + (i*30),69)
+					Drawing.drawText(Constants.SCREEN.WIDTH + 23 + (i * 30), 67, ":" .. statusHealCount, Theme.COLORS["Default text"], shadowcolor)
+					i = i + 1
+				end
+			end
+		end,
+	}
+	TrackerScreen.HealingCarouselItems[TrackerScreen.HealingCarouselTypes.STATUS_HEALS_2] = {
+		type = TrackerScreen.HealingCarouselTypes.STATUS_HEALS_2,
+		isVisible = function() return Tracker.Data.isViewingOwn end,
+		framesToShow = 180,
+		draw = function() 
+			-- TODO: draw status heals section
+			local shadowcolor = Utils.calcShadowColor(Theme.COLORS["Upper box background"])
+			Drawing.drawText(Constants.SCREEN.WIDTH + 6, 57, "Heals in Bag:", Theme.COLORS["Default text"], shadowcolor)
+			local i = 0
+			for status, quantity in pairs(Tracker.Data.healingItems.status) do
+				if status == MiscData.StatusType.Sleep or status == MiscData.StatusType.Freeze or status == MiscData.StatusType.All then
+					local statusHealCount = math.min(99, quantity)
+					Drawing.drawStatusIcon(MiscData.StatusCodeMap[status],Constants.SCREEN.WIDTH + 8 + (i*30),69)
+					Drawing.drawText(Constants.SCREEN.WIDTH + 23 + (i * 30), 67, ": " .. statusHealCount, Theme.COLORS["Default text"], shadowcolor)
+					i = i + 1
+				end
+			end
 		end,
 	}
 
@@ -561,6 +596,7 @@ function TrackerScreen.drawScreen()
 	TrackerScreen.drawStatsArea(viewedPokemon)
 	TrackerScreen.drawMovesArea(viewedPokemon, opposingPokemon)
 	TrackerScreen.drawCarouselArea(viewedPokemon)
+	TrackerScreen.drawHealingCarouselArea(viewedPokemon)
 end
 
 function TrackerScreen.drawPokemonInfoArea(pokemon)
@@ -658,17 +694,8 @@ function TrackerScreen.drawPokemonInfoArea(pokemon)
 		end
 	end
 
-	-- HEALS INFO / ENCOUNTER INFO
-	local infoBoxHeight = 23
-	gui.drawRectangle(Constants.SCREEN.WIDTH + Constants.SCREEN.MARGIN, Constants.SCREEN.MARGIN + 52, 96, infoBoxHeight, Theme.COLORS["Upper box border"], Theme.COLORS["Upper box background"])
-
+	-- Draw PC Heals Button
 	if Tracker.Data.isViewingOwn then
-		if (Tracker.Data.)
-		Drawing.drawText(Constants.SCREEN.WIDTH + 6, 57, "Heals in Bag:", Theme.COLORS["Default text"], shadowcolor)
-		local healPercentage = math.min(9999, Tracker.Data.healingItems.healing)
-		local healCount = math.min(99, Tracker.Data.healingItems.numHeals)
-		Drawing.drawText(Constants.SCREEN.WIDTH + 6, 67, string.format("%.0f%%", healPercentage) .. " HP (" .. healCount .. ")", Theme.COLORS["Default text"], shadowcolor)
-
 		if (Options["Track PC Heals"]) then
 			Drawing.drawText(Constants.SCREEN.WIDTH + 60, 57, "PC Heals:", Theme.COLORS["Default text"], shadowcolor)
 			-- Right-align the PC Heals number
@@ -962,26 +989,10 @@ function TrackerScreen.drawCarouselArea(pokemon)
 end
 
 function TrackerScreen.drawHealingCarouselArea(pokemon)
-	local shadowcolor = Utils.calcShadowColor(Theme.COLORS["Lower box background"])
-
-	-- Draw the border box for the Stats area
-	gui.drawRectangle(Constants.SCREEN.WIDTH + Constants.SCREEN.MARGIN, 136, Constants.SCREEN.RIGHT_GAP - (2 * Constants.SCREEN.MARGIN), 19, Theme.COLORS["Lower box border"], Theme.COLORS["Lower box background"])
-
+	-- HEALS INFO / ENCOUNTER INFO
+	local infoBoxHeight = 23
+	--Just draw rectangle, leave the rest to the healing carousel
+	gui.drawRectangle(Constants.SCREEN.WIDTH + Constants.SCREEN.MARGIN, Constants.SCREEN.MARGIN + 52, 96, infoBoxHeight, Theme.COLORS["Upper box border"], Theme.COLORS["Upper box background"])
 	local carousel = TrackerScreen.getCurrentHealingCarouselItem()
-	for _, content in pairs(carousel.getContentList(pokemon)) do
-		if type(content) == "string" then
-			local wrappedText = Utils.getWordWrapLines(content, 34) -- was 31
-
-			if #wrappedText == 1 then
-				Drawing.drawText(Constants.SCREEN.WIDTH + Constants.SCREEN.MARGIN + 1, 140, wrappedText[1], Theme.COLORS["Default text"], shadowcolor)
-			elseif #wrappedText >= 2 then
-				Drawing.drawText(Constants.SCREEN.WIDTH + Constants.SCREEN.MARGIN + 1, 136, wrappedText[1], Theme.COLORS["Default text"], shadowcolor)
-				Drawing.drawText(Constants.SCREEN.WIDTH + Constants.SCREEN.MARGIN + 1, 145, wrappedText[2], Theme.COLORS["Default text"], shadowcolor)
-				gui.drawLine(Constants.SCREEN.WIDTH + Constants.SCREEN.MARGIN, 155, Constants.SCREEN.WIDTH + Constants.SCREEN.RIGHT_GAP - Constants.SCREEN.MARGIN, 155, Theme.COLORS["Lower box border"])
-				gui.drawLine(Constants.SCREEN.WIDTH + Constants.SCREEN.MARGIN, 156, Constants.SCREEN.WIDTH + Constants.SCREEN.RIGHT_GAP - Constants.SCREEN.MARGIN, 156, Theme.COLORS["Main background"])
-			end
-		end
-	end
-
-
+	carousel.draw()
 end

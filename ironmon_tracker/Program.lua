@@ -8,7 +8,7 @@ Program = {
 		waitToDraw = 0,
 		battleDataDelay = 0,
 		half_sec_update = 30,
-		three_sec_update = 180,
+		three_sec_update = 60,
 		saveData = 3600,
 		carouselActive = 0,
 		healingCarouselActive = 0,
@@ -158,6 +158,7 @@ function Program.updateTrackedAndCurrentData()
 	Program.Frames.three_sec_update = Program.Frames.three_sec_update - 1
 	Program.Frames.saveData = Program.Frames.saveData - 1
 	Program.Frames.carouselActive = Program.Frames.carouselActive + 1
+	Program.Frames.healingCarouselActive = Program.Frames.healingCarouselActive + 1
 end
 
 function Program.updatePokemonTeamsFromMemory()
@@ -809,12 +810,12 @@ function Program.calcBagHealingItemsFromMemory(pokemonMaxHP)
 		healing = 0,
 		numHeals = 0,
 		status = {
-			burn = 0,
-			freeze = 0,
-			sleep = 0,
-			poison = 0,
-			paralyze = 0,
-			all = 0,
+			[MiscData.StatusType.Burn] = 0,
+			[MiscData.StatusType.Freeze] = 0,
+			[MiscData.StatusType.Paralyze] = 0,
+			[MiscData.StatusType.Poison] = 0,
+			[MiscData.StatusType.Sleep] = 0,
+			[MiscData.StatusType.All] = 0,
 		},
 	}
 
@@ -849,34 +850,9 @@ function Program.calcBagHealingItemsFromMemory(pokemonMaxHP)
 			totals.healing = totals.healing + healingPercentage
 			totals.numHeals = totals.numHeals + quantity
 		end
-		if (statusHealItemData ~= null and quantity > 0) then
-			if statusHealItemData.type = MiscData.StatusType.Burn then
-				status.burn = status.burn + 1
-			end
-			if statusHealItemData.type = MiscData.StatusType.Poison then
-				status.freeze = status.freeze + 1
-			end
-			if statusHealItemData.type = MiscData.StatusType.Poison then
-				status.sleep = status.sleep + 1
-			end
-			if statusHealItemData.type = MiscData.StatusType.Poison then
-				status.poison = status.poison + 1
-			end
-			if statusHealItemData.type = MiscData.StatusType.Poison then
-				status.paralyze = status.paralyze + 1
-			end
-			if statusHealItemData.type = MiscData.StatusType.All then
-				--[[ not sure if we should double count the 'All' heals in the individual categories. Leaning towards no
-				status.burn = status.burn + 1
-				status.freeze = status.freeze + 1
-				status.sleep = status.sleep + 1
-				status.poison = status.poison + 1
-				status.paralyze = status.paralyze + 1
-				]]
-				status.all = status.all + 1
-			end
+		if statusHealItemData ~= null and quantity > 0 and totals.status[statusHealItemData.type] ~= nil then
+			totals.status[statusHealItemData.type] = totals.status[statusHealItemData.type] + 1
 		end
-
 	end
 
 	return totals

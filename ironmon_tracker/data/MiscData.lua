@@ -40,6 +40,7 @@ MiscData.StatusCodeMap = {
 	[MiscData.StatusType.Poison] = "PSN",
 	[MiscData.StatusType.Toxic] = "PSN",
 	[MiscData.StatusType.Sleep] = "SLP",
+	[MiscData.StatusType.All] = "ALL",
 }
 
 -- Currently unused data

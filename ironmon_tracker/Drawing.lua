@@ -38,7 +38,6 @@ end
 
 function Drawing.drawStatusIcon(status, x, y)
 	if status == nil or status == "" then return end
-
 	gui.drawImage(Main.DataFolder .. "/images/status/" .. status .. ".png", x, y, 16, 8)
 end
 
