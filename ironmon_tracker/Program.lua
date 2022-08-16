@@ -11,7 +11,6 @@ Program = {
 		three_sec_update = 60,
 		saveData = 3600,
 		carouselActive = 0,
-		healingCarouselActive = 0,
 	},
 	BattleTurn = {
 		turnCount = -1,
@@ -158,7 +157,6 @@ function Program.updateTrackedAndCurrentData()
 	Program.Frames.three_sec_update = Program.Frames.three_sec_update - 1
 	Program.Frames.saveData = Program.Frames.saveData - 1
 	Program.Frames.carouselActive = Program.Frames.carouselActive + 1
-	Program.Frames.healingCarouselActive = Program.Frames.healingCarouselActive + 1
 end
 
 function Program.updatePokemonTeamsFromMemory()
