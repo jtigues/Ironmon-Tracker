@@ -226,11 +226,11 @@ function TrackerScreen.initialize()
 		}
 	end
 
-	TrackerScreen.buildCarousels()
+	TrackerScreen.buildCarousel()
 end
 
 -- Define each Carousel Item, must will have blank data that will be populated later with contextual data
-function TrackerScreen.buildCarousels()
+function TrackerScreen.buildCarousel()
 	--  BADGE
 	TrackerScreen.CarouselItems[TrackerScreen.CarouselTypes.BADGES] = {
 		type = TrackerScreen.CarouselTypes.BADGES,
@@ -604,8 +604,16 @@ function TrackerScreen.drawPokemonInfoArea(pokemon)
 		end
 	end
 
+	-- HEALS INFO / ENCOUNTER INFO
+	local infoBoxHeight = 23
+	gui.drawRectangle(Constants.SCREEN.WIDTH + Constants.SCREEN.MARGIN, Constants.SCREEN.MARGIN + 52, 96, infoBoxHeight, Theme.COLORS["Upper box border"], Theme.COLORS["Upper box background"])
+
 	-- Draw PC Heals Button
 	if Tracker.Data.isViewingOwn then
+		Drawing.drawText(Constants.SCREEN.WIDTH + 6, 57, "Heals in Bag:", Theme.COLORS["Default text"], shadowcolor)
+		local healPercentage = math.min(9999, Tracker.Data.healingItems.healing)
+		local healCount = math.min(99, Tracker.Data.healingItems.numHeals)
+		Drawing.drawText(Constants.SCREEN.WIDTH + 6, 67, string.format("%.0f%%", healPercentage) .. " HP (" .. healCount .. ")", Theme.COLORS["Default text"], shadowcolor)
 		if (Options["Track PC Heals"]) then
 			Drawing.drawText(Constants.SCREEN.WIDTH + 60, 57, "PC Heals:", Theme.COLORS["Default text"], shadowcolor)
 			-- Right-align the PC Heals number
