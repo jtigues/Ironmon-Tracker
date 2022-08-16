@@ -2,6 +2,7 @@ Options = {
 	-- Tracks if any option elements were modified so we know if we need to save them to the Settings.ini file
 	settingsUpdated = false,
 
+	FIRST_RUN = true,
 	ROMS_FOLDER = "",
 
 	-- 'Default' set of Options, but will get replaced by what's in Settings.ini
@@ -19,6 +20,7 @@ Options = {
 	["Pokemon icon set"] = "1", -- Original icon set
 	["Show last damage calcs"] = true,
 	["Reveal info if randomized"] = true,
+	["Animated Pokemon popout"] = false,
 
 	CONTROLS = {
 		["Load next seed"] = "A, B, Start, Select",
@@ -53,6 +55,8 @@ function Options.initialize()
 	if toggleViewValue ~= "Start" then
 		Constants.OrderedLists.TIPS[3] = Constants.OrderedLists.TIPS[3]:gsub("Start", toggleViewValue)
 	end
+
+	Drawing.AnimatedPokemon:create()
 end
 
 function Options.updateSetting(optionKey, value)
