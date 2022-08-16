@@ -614,6 +614,7 @@ function TrackerScreen.drawPokemonInfoArea(pokemon)
 		local healPercentage = math.min(9999, Tracker.Data.healingItems.healing)
 		local healCount = math.min(99, Tracker.Data.healingItems.numHeals)
 		Drawing.drawText(Constants.SCREEN.WIDTH + 6, 67, string.format("%.0f%%", healPercentage) .. " HP (" .. healCount .. ")", Theme.COLORS["Default text"], shadowcolor)
+		
 		if (Options["Track PC Heals"]) then
 			Drawing.drawText(Constants.SCREEN.WIDTH + 60, 57, "PC Heals:", Theme.COLORS["Default text"], shadowcolor)
 			-- Right-align the PC Heals number
