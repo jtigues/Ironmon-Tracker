@@ -614,6 +614,8 @@ function Battle.beginNewBattle()
 		Program.currentScreen = Program.Screens.TRACKER
 	elseif Program.currentScreen == Program.Screens.MOVE_HISTORY then
 		Program.currentScreen = Program.Screens.TRACKER
+	elseif Program.currentScreen == Program.Screens.TYPE_DEFENSES then
+		Program.currentScreen = Program.Screens.TRACKER
 	end
 
 	 -- Delay drawing the new pokemon (or effectiveness of your own), because of send out animation
@@ -621,6 +623,10 @@ function Battle.beginNewBattle()
 
 	if not Main.IsOnBizhawk() then
 		MGBA.Screens.LookupPokemon.manuallySet = false
+	end
+
+	if CustomCode.enabled and CustomCode.afterBattleBegins ~= nil then
+		CustomCode.afterBattleBegins()
 	end
 end
 
@@ -688,6 +694,8 @@ function Battle.endCurrentBattle()
 		Program.currentScreen = Program.Screens.TRACKER
 	elseif Program.currentScreen == Program.Screens.MOVE_HISTORY then
 		Program.currentScreen = Program.Screens.TRACKER
+	elseif Program.currentScreen == Program.Screens.TYPE_DEFENSES then
+		Program.currentScreen = Program.Screens.TRACKER
 	elseif GameSettings.game == 2 and opposingTrainerId == 804 and lastBattleStatus == 1 then -- Emerald only, 804 = Steven, status(1) = Win
 		Battle.defeatedSteven = true
 		Program.currentScreen = Program.Screens.GAMEOVER
@@ -696,6 +704,10 @@ function Battle.endCurrentBattle()
 	-- Delay drawing the return to viewing your pokemon screen
 	Program.Frames.waitToDraw = Utils.inlineIf(Battle.isWildEncounter, 70, 150)
 	Program.Frames.saveData = Utils.inlineIf(Battle.isWildEncounter, 70, 150) -- Save data after every battle
+
+	if CustomCode.enabled and CustomCode.afterBattleEnds ~= nil then
+		CustomCode.afterBattleEnds()
+	end
 end
 
 function Battle.resetBattle()

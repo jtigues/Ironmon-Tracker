@@ -11,6 +11,7 @@ FileManager.Folders = {
 	ScreensCode = "screens",
 	Languages = "Languages",
 	RandomizerSettings = "RandomizerSettings",
+	Custom = "Custom",
 	Images = "images",
 	Trainers = "trainers",
 	Badges = "badges",
@@ -24,6 +25,7 @@ FileManager.Files = {
 	RANDOMIZER_ERROR_LOG = "RandomizerErrorLog.txt",
 	UPDATE_OR_INSTALL = "UpdateOrInstall.lua",
 	OSEXECUTE_OUTPUT = FileManager.Folders.TrackerCode .. FileManager.slash .. "osexecute-output.txt",
+	CUSTOM_CODE = FileManager.Folders.TrackerCode .. FileManager.slash .. FileManager.Folders.Custom .. FileManager.slash .. "CustomCode.lua",
 
 	-- All of the files required by the tracker
 	LuaCode = {
@@ -55,6 +57,7 @@ FileManager.Files = {
 		FileManager.Folders.ScreensCode .. FileManager.slash .. "TrackedDataScreen.lua",
 		FileManager.Folders.ScreensCode .. FileManager.slash .. "StatsScreen.lua",
 		FileManager.Folders.ScreensCode .. FileManager.slash .. "MoveHistoryScreen.lua",
+		FileManager.Folders.ScreensCode .. FileManager.slash .. "TypeDefensesScreen.lua",
 		FileManager.Folders.ScreensCode .. FileManager.slash .. "GameOverScreen.lua",
 		FileManager.Folders.ScreensCode .. FileManager.slash .. "StreamerScreen.lua",
 		FileManager.Folders.ScreensCode .. FileManager.slash .. "TimeMachineScreen.lua",
@@ -271,13 +274,22 @@ function FileManager.getFilesFromDirectory(folderpath)
 	return files
 end
 
--- There is probably a better way to do this
 function FileManager.buildImagePath(imageFolder, imageName, imageExtension)
 	local listOfPaths = {
 		FileManager.Folders.TrackerCode,
 		FileManager.Folders.Images,
 		tostring(imageFolder),
 		tostring(imageName) .. (imageExtension or "")
+	}
+	return FileManager.prependDir(table.concat(listOfPaths, FileManager.slash))
+end
+
+-- Returns a properly formatted folder path where custom code files are located
+function FileManager.getCustomFolderPath()
+	local listOfPaths = {
+		FileManager.Folders.TrackerCode,
+		FileManager.Folders.Custom,
+		"",
 	}
 	return FileManager.prependDir(table.concat(listOfPaths, FileManager.slash))
 end
