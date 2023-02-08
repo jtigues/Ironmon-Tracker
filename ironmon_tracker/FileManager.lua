@@ -5,13 +5,13 @@ FileManager.slash = package.config:sub(1,1) or "\\"
 
 FileManager.Folders = {
 	TrackerCode = "ironmon_tracker",
+	Custom = "extensions",
 	Quickload = "quickload",
 	SavedGames = "saved_games", -- needs to be created first to be used
 	DataCode = "data",
 	ScreensCode = "screens",
 	Languages = "Languages",
 	RandomizerSettings = "RandomizerSettings",
-	Custom = "Custom",
 	Images = "images",
 	Trainers = "trainers",
 	Badges = "badges",
@@ -25,7 +25,6 @@ FileManager.Files = {
 	RANDOMIZER_ERROR_LOG = "RandomizerErrorLog.txt",
 	UPDATE_OR_INSTALL = "UpdateOrInstall.lua",
 	OSEXECUTE_OUTPUT = FileManager.Folders.TrackerCode .. FileManager.slash .. "osexecute-output.txt",
-	CUSTOM_CODE_SETTINGS = "CustomCodeSettings.lua",
 
 	-- All of the files required by the tracker
 	LuaCode = {
@@ -61,6 +60,7 @@ FileManager.Files = {
 		FileManager.Folders.ScreensCode .. FileManager.slash .. "GameOverScreen.lua",
 		FileManager.Folders.ScreensCode .. FileManager.slash .. "StreamerScreen.lua",
 		FileManager.Folders.ScreensCode .. FileManager.slash .. "TimeMachineScreen.lua",
+		FileManager.Folders.ScreensCode .. FileManager.slash .. "CustomExtensionsScreen.lua",
 		FileManager.Folders.ScreensCode .. FileManager.slash .. "LogOverlay.lua",
 		"Input.lua",
 		"Drawing.lua",
@@ -100,6 +100,7 @@ FileManager.Extensions = {
 	TRAINER = ".png",
 	BADGE = ".png",
 	SAVESTATE = ".State", -- Bizhawk save-state
+	LUA_CODE = ".lua",
 }
 
 FileManager.Urls = {
@@ -288,7 +289,6 @@ end
 -- Returns a properly formatted folder path where custom code files are located
 function FileManager.getCustomFolderPath()
 	local listOfPaths = {
-		FileManager.Folders.TrackerCode,
 		FileManager.Folders.Custom,
 		"", -- Necessary to include a trailing slash, helps with appending a filename
 	}
@@ -445,7 +445,7 @@ function FileManager.readLinesFromFile(filename)
 
 	local fileContents = file:read("*a")
 	if fileContents ~= nil and fileContents ~= "" then
-		for line in fileContents:gmatch("([^\r\n]+)\r?\n") do
+		for line in fileContents:gmatch("([^\r\n]+)[\r\n]*") do
 			if line ~= nil then
 				table.insert(lines, line)
 			end
