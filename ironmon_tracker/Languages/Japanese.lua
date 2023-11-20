@@ -105,6 +105,7 @@ ScreenResources{
 		RandomBallMiddle = "中",
 		RandomBallRight = "右",
 		HealsInBag = "道具内回復",
+		UnidentifiedGhost = "Ghost", -- NEEDS TRANSLATION
 		BattleNewEncounter = "新出現",
 		BattleLastSeen = "前出現",
 		BattleSeenInTheWild = "野生バトル",
@@ -571,6 +572,11 @@ ScreenResources{
 	CustomCode = {
 		ExtensionsLoaded = "Extensions Loaded", -- NEEDS TRANSLATION
 		ExtensionsMissing = "Extensions Missing", -- NEEDS TRANSLATION
+	},
+	StreamConnectOverlay = {
+		O_SendMessage = "Send chat message if successful", -- NEEDS TRANSLATION
+		O_AutoComplete = "Auto-complete the redeem", -- NEEDS TRANSLATION
+		O_RequireChosenMon = "Your pick direction must match", -- NEEDS TRANSLATION
 	},
 	MGBA = {
 		MenuTrackerSettings = "Tracker Settings", -- NEEDS TRANSLATION

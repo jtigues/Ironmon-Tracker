@@ -105,6 +105,7 @@ ScreenResources{
 		RandomBallMiddle = "Middle", -- NEEDS TRANSLATION
 		RandomBallRight = "Right", -- NEEDS TRANSLATION
 		HealsInBag = "Heals", -- NEEDS TRANSLATION
+		UnidentifiedGhost = "Ghost", -- NEEDS TRANSLATION
 		BattleNewEncounter = "New encounter", -- NEEDS TRANSLATION
 		BattleLastSeen = "Last seen", -- NEEDS TRANSLATION
 		BattleSeenInTheWild = "Seen in the wild", -- NEEDS TRANSLATION
@@ -569,6 +570,11 @@ ScreenResources{
 	CustomCode = {
 		ExtensionsLoaded = "Extensions Loaded", -- NEEDS TRANSLATION
 		ExtensionsMissing = "Extensions Missing", -- NEEDS TRANSLATION
+	},
+	StreamConnectOverlay = {
+		O_SendMessage = "Send chat message if successful", -- NEEDS TRANSLATION
+		O_AutoComplete = "Auto-complete the redeem", -- NEEDS TRANSLATION
+		O_RequireChosenMon = "Your pick direction must match", -- NEEDS TRANSLATION
 	},
 	MGBA = {
 		MenuTrackerSettings = "Tracker Settings", -- NEEDS TRANSLATION
